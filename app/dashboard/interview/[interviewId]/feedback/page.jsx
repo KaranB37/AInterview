@@ -49,8 +49,8 @@ setFeedbackList(result)
             <CollapsibleContent>
             <div className='flex flex-col gap-2'>
                     <h2 className='text-red-500 p-2 border rounded-lg'> <strong>Rating:</strong>{item.rating}</h2>
-                     <h2 className='p-2 border rounded-lg bg-red-50 text-sm text-red-900'><strong>Your Answer: </strong></h2>
-                     <h2 className='p-2 border rounded-lg bg-green-50 text-sm text-green-900'><strong>Correct Answer: </strong></h2>
+                     <h2 className='p-2 border rounded-lg bg-red-50 text-sm text-red-900'><strong>Your Answer: {item.userAns}</strong></h2>
+                     <h2 className='p-2 border rounded-lg bg-green-50 text-sm text-green-900'><strong>Feedback for Answer: {item.feedback}</strong></h2>
                      
                       </div>
             </CollapsibleContent>
