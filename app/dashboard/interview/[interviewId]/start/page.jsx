@@ -17,7 +17,9 @@ const [activeQuestionIndex,setActiveQuestionIndex]= useState(0)
         GetInterviewDetails()
     },[])
     const [result,setResult]=useState()
+const [mockId,setMockId] = useState()
 
+setMockId(params.interviewId)
     const GetInterviewDetails = async () => {
         // try {
         const resmm= await db.select().from(MockInterview).where(eq(MockInterview.mockId, params.interviewId));
@@ -65,7 +67,7 @@ const [activeQuestionIndex,setActiveQuestionIndex]= useState(0)
            {activeQuestionIndex != mockInterviewQuestion?.length-1 &&  
               <Button onClick={()=> setActiveQuestionIndex(activeQuestionIndex+1)}>Next Question</Button>}
             { activeQuestionIndex == mockInterviewQuestion?.length-1 &&   
-            <Link href={'/dashboard/interview/'+interviewData?.mockId+"/feedback"}>
+            <Link href={'/dashboard/interview/'+mockId+"/feedback"}>
             <Button>End Interview</Button>
             </Link>
             }
