@@ -11,18 +11,23 @@ import { UserAnswer } from '../../../../../../utils/schema'; // Import UserAnswe
 import { db } from '../../../../../../utils/db'; // Make sure to import db properly
 import { useUser } from '@clerk/nextjs';
 import moment from 'moment';
+import { useRouter, usePathname } from 'next/navigation';
 import webcamimg from "./webcam.png";
 
-export const RecordAnsSection = ({ mockInterviewQuestion, activeQuestionIndex }) => {
+export const RecordAnsSection = ({ mockInterviewQuestion, activeQuestionIndex,interviewData }) => {
+  console.log(interviewData)
+  const router = useRouter();
+  const pathname = usePathname();
   const [userAnswer, setUserAnswer] = useState('');
   const [loading, setLoading] = useState(false);
-  const { user } = useUser();
+  const {user}   = useUser();
 
   const {
     isRecording,
     results,
     startSpeechToText,
     stopSpeechToText,
+    setResults
   } = useSpeechToText({
     continuous: true,
     useLegacyResults: false,
@@ -30,10 +35,26 @@ export const RecordAnsSection = ({ mockInterviewQuestion, activeQuestionIndex })
 
   // Update user answer when speech recognition returns results
   useEffect(() => {
+    console.log("User Data",user)
     if (results.length > 0) {
       setUserAnswer(prev => prev + " " + results.map(res => res.transcript).join(" "));
     }
   }, [results]);
+
+  // Extract mockId from the URL path
+  const extractMockId = () => {
+    // Parse the pathname (e.g., "/dashboard/interview/22bb8b3a-ccc3-4f35-a2b1-348af56f68e8/start")
+    const pathParts = pathname?.split('/') || [];
+    // The mockId should be the part between "interview" and "start"
+    const interviewIndex = pathParts.findIndex(part => part === 'interview');
+    if (interviewIndex !== -1 && pathParts.length > interviewIndex + 1) {
+      console.log("Extracted mockId:", pathParts[interviewIndex + 1]);
+      return pathParts[interviewIndex + 1];
+    }
+    return "Unknown";
+  };
+
+
 
   const StartStopRecording = async () => {
     if (isRecording) {
@@ -63,7 +84,7 @@ export const RecordAnsSection = ({ mockInterviewQuestion, activeQuestionIndex })
 
       const questionData = mockInterviewQuestion[activeQuestionIndex];
       const questionText = questionData?.Question || "Unknown Question";
-      const feedbackPrompt = `Question: ${questionText}, User Answer: ${userAnswer}. Provide a JSON response with 'rating' and 'feedback'.`;
+      const feedbackPrompt = `Question: ${questionText}, User Answer: ${userAnswer}. Provide a JSON response with 'rating' and 'feedback' and 'correctAns'.`;
 
       const result = await chatSession.sendMessage(feedbackPrompt);
       const rawText = await result.response.text();
@@ -79,10 +100,14 @@ export const RecordAnsSection = ({ mockInterviewQuestion, activeQuestionIndex })
       console.log(JsonFeedbackResp);
 
       if (JsonFeedbackResp) {
+
+        const mockId = extractMockId();
+        console.log("Using mockId for database:", mockId);
+
         const res = await db.insert(UserAnswer).values({
-          mockIdRef: questionData?.mockId || "Unknown",
+           mockIdRef: mockId,
           question: questionText,
-          correctAns: questionData?.correctAns || "N/A",
+          correctAns: JsonFeedbackResp?.correctAns || "N/A",
           userAns: userAnswer,
           feedback: JsonFeedbackResp?.feedback || "No feedback provided",
           rating: JsonFeedbackResp?.rating || "N/A",
@@ -93,7 +118,10 @@ export const RecordAnsSection = ({ mockInterviewQuestion, activeQuestionIndex })
         if (res) {
           console.log("Insert response:", res);
           toast.success("User answer recorded successfully!");
+          setUserAnswer('')
+          setResults([])
         } else {
+          setResults([])
           toast.error("Failed to save the answer. Try again.");
         }
       } else {
