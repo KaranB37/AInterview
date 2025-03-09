@@ -30,12 +30,20 @@ console.log(result)
 setFeedbackList(result)
     }
 
+    // Calculate average rating
+    const calculateAverageRating = () => {
+        if (feedbackList.length === 0) return 0;
+        const totalRating = feedbackList.reduce((acc, item) => acc + (item.rating || 0), 0);
+        return (totalRating / feedbackList.length).toFixed(1); // Return average with one decimal place
+    }
+
+    const averageRating = calculateAverageRating();
 
   return (
     <div className='p-10'>
         <h2 className='text-3xl font-bold text-green-500'>Congratulations!</h2>
       <h2 className='font-bold text-2xl'>Here is your interview Feedback</h2>
-      <h2 className='text-primary text-lg my-3'>Your Overall interview rating: <strong>7/10</strong></h2>
+      <h2 className='text-primary text-lg my-3'>Your Overall interview rating: <strong>{averageRating}/10</strong></h2>
    <h2 className='text-sm text-gray-500'>Find below interview question with correct answer, your answer and feedback for improvement</h2>
    
    {feedbackList&& feedbackList.map((item,index)=>(
