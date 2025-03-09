@@ -5,6 +5,7 @@ import MockInterview from '../../../../../utils/schema';
 import { eq } from 'drizzle-orm';
 import QuestionSection from "../start/_components/QuestionSection"
 import RecordAnsSection from "../start/_components/RecordAnsSection"
+import { Button } from '../../../../../components/ui/button';
 const Start = ({params}) => {
 
     const [interviewData, setInterviewData] = useState();
@@ -47,6 +48,11 @@ const [activeQuestionIndex,setActiveQuestionIndex]= useState(0)
             {/* audio recording  */}
             <RecordAnsSection mockInterviewQuestion={mockInterviewQuestion}
             activeQuestionIndex={activeQuestionIndex} />
+            </div>
+            <div className='flex justify-end gap-6 mb-14'>
+           { activeQuestionIndex > 0 &&  <>  <Button onClick={()=> setActiveQuestionIndex(activeQuestionIndex-1)}>Previous Question</Button></>}
+           {activeQuestionIndex != mockInterviewQuestion?.length-1 &&     <Button onClick={()=> setActiveQuestionIndex(activeQuestionIndex+1)}>Next Question</Button>}
+            { activeQuestionIndex == mockInterviewQuestion?.length-1 &&    <Button>End Interview</Button>}
             </div>
     </div>
   )
