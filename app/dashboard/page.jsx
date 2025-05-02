@@ -1,6 +1,8 @@
 import { UserButton } from '@clerk/nextjs'
 import React from 'react'
 import AddNewInterview from "../dashboard/_components/AddNewInterview" 
+import Link from 'next/link'
+
 const Dashboard = () => {
   return (
     <div className='p-10'>
@@ -11,6 +13,11 @@ const Dashboard = () => {
    <div>
 
     <AddNewInterview/>
+   </div>
+   <div className='mt-5'>
+    <Link href="/dashboard/admin">
+      <button className='bg-blue-500 text-white px-4 py-2 rounded'>View Candidates</button>
+    </Link>
    </div>
     </div>
   )
