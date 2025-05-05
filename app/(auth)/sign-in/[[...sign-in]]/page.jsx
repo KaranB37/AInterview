@@ -28,7 +28,7 @@ export default function Page() {
             Welcome to Hire Buddy 🦑
           </h1>
   
-         <SignIn/>
+         <SignIn redirectUrl="/dashboard"/>
         </div>
       </main>
     </div>
