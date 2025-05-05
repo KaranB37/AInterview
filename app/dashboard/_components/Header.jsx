@@ -1,26 +1,61 @@
 "use client";
 import { UserButton } from '@clerk/nextjs'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect } from 'react'
+import Link from 'next/link'
 
 const Header = () => {
-    const path=usePathname();
-    useEffect((
+    const path = usePathname();
+    const router = useRouter();
+    
+    const navItems = [
+        { name: 'Dashboard', path: '/dashboard' },
+        { name: 'Questions', path: '/dashboard/questions' },
+        { name: 'Upgrade', path: '/dashboard/upgrade' },
+        { name: 'How it Works', path: '/dashboard/howitworks' }
+    ];
 
-    )=>{console.log(path)},[])
-  return (
-    <div className='flex p-4 items-center justify-between bg-secondary shadow-sm'>
-      <Image src={'/logo.svg'} width={100} height={100} alt=''/>
-      <ul className='hidden md:flex gap-6'>
-        <li className={`hover:text-primary hover:font-bold transition-all cursor-pointer ${path=='/dashboard'&& 'text-primary font-bold'}`}>Dashboard</li>
-        <li className={`hover:text-primary hover:font-bold transition-all cursor-pointer ${path=='/dashboard/questions'&& 'text-primary font-bold'}`}>Questions</li>
-        <li className={`hover:text-primary hover:font-bold transition-all cursor-pointer ${path=='/dashboard/upgrade'&& 'text-primary font-bold'}`}>Upgrade</li>
-        <li className={`hover:text-primary hover:font-bold transition-all cursor-pointer ${path=='/dashboard/howitworks'&& 'text-primary font-bold'}`}>How it Works?</li>
-      </ul>
-      <UserButton/>
-    </div>
-  )
+    useEffect(() => {
+        console.log(path)
+    }, [])
+    
+    return (
+        <div className="sticky top-0 z-50 backdrop-blur-lg bg-white/80 border-b border-gray-100">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex h-16 items-center justify-between">
+                    <div className="flex items-center">
+                        <Link href="/dashboard">
+                            <div className="flex items-center cursor-pointer">
+                                <Image src={'/logo.svg'} width={40} height={40} alt='HireBuddy Logo' />
+                                <span className="ml-2 text-xl font-medium text-gray-900">Hire<span className="font-semibold">Buddy</span></span>
+                            </div>
+                        </Link>
+                    </div>
+
+                    <nav className="hidden md:flex space-x-8">
+                        {navItems.map((item) => (
+                            <Link 
+                                key={item.name} 
+                                href={item.path}
+                                className={`inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors duration-200 ${
+                                    path === item.path 
+                                    ? 'text-blue-600 border-b-2 border-blue-600' 
+                                    : 'text-gray-500 hover:text-gray-900'
+                                }`}
+                            >
+                                {item.name}
+                            </Link>
+                        ))}
+                    </nav>
+
+                    <div className="flex items-center space-x-4">
+                        <UserButton afterSignOutUrl="/" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
 }
 
 export default Header
