@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Webcam from 'react-webcam';
 import { Button } from '../../../../../../components/ui/button';
 import { toast } from 'sonner';
-import { Mic, StopCircle } from 'lucide-react';
+import { Mic, StopCircle, Loader2, AlertCircle, CheckCircle, Waveform } from 'lucide-react';
 import useSpeechToText from 'react-hook-speech-to-text';
 import chatSession from '../../../../../../utils/GeminiAIModel';
 import { UserAnswer } from '../../../../../../utils/schema'; // Import UserAnswer schema directly
@@ -14,13 +14,13 @@ import moment from 'moment';
 import { useRouter, usePathname } from 'next/navigation';
 import webcamimg from "./webcam.png";
 
-export const RecordAnsSection = ({ mockInterviewQuestion, activeQuestionIndex,interviewData }) => {
+export const RecordAnsSection = ({ mockInterviewQuestion, activeQuestionIndex, interviewData }) => {
   console.log(interviewData)
   const router = useRouter();
   const pathname = usePathname();
   const [userAnswer, setUserAnswer] = useState('');
   const [loading, setLoading] = useState(false);
-  const {user}   = useUser();
+  const { user } = useUser();
 
   const {
     isRecording,
@@ -35,7 +35,7 @@ export const RecordAnsSection = ({ mockInterviewQuestion, activeQuestionIndex,in
 
   // Update user answer when speech recognition returns results
   useEffect(() => {
-    console.log("User Data",user)
+    console.log("User Data", user)
     if (results.length > 0) {
       setUserAnswer(prev => prev + " " + results.map(res => res.transcript).join(" "));
     }
@@ -53,8 +53,6 @@ export const RecordAnsSection = ({ mockInterviewQuestion, activeQuestionIndex,in
     }
     return "Unknown";
   };
-
-
 
   const StartStopRecording = async () => {
     if (isRecording) {
@@ -100,12 +98,11 @@ export const RecordAnsSection = ({ mockInterviewQuestion, activeQuestionIndex,in
       console.log(JsonFeedbackResp);
 
       if (JsonFeedbackResp) {
-
         const mockId = extractMockId();
         console.log("Using mockId for database:", mockId);
 
         const res = await db.insert(UserAnswer).values({
-           mockIdRef: mockId,
+          mockIdRef: mockId,
           question: questionText,
           correctAns: JsonFeedbackResp?.correctAns || "N/A",
           userAns: userAnswer,
@@ -137,24 +134,73 @@ export const RecordAnsSection = ({ mockInterviewQuestion, activeQuestionIndex,in
   };
 
   return (
-    <div className='flex items-center justify-center flex-col'>
-      <div className='ml-5 p-5 border rounded-lg mt-5 flex flex-col justify-center items-center g-10'>
-        <Image src={webcamimg} width={200} height={200} className='absolute'/>
-        <Webcam mirrored={true} style={{ height: 300, width: '100%', zIndex: 10 }}/>
+    <div className="p-6">
+      <h3 className="text-lg font-medium text-gray-800 mb-4">Your Response</h3>
+      
+      <div className="mb-6 relative rounded-lg overflow-hidden bg-gray-50 border border-gray-200">
+        <Webcam 
+          mirrored={true} 
+          className="w-full h-[280px] object-cover"
+        />
+        {isRecording && (
+          <div className="absolute bottom-3 right-3 flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-sm animate-pulse">
+            <Mic className="h-3 w-3" />
+            Recording
+          </div>
+        )}
       </div>
-
-      <Button 
-        disabled={loading} 
-        variant="outline" 
-        className="my-10 bg-black text-white cursor-pointer" 
-        onClick={StartStopRecording}
-      >
-        {isRecording 
-          ? <span className='flex justify-center items-center gap-2'><StopCircle/> Stop Recording</span> 
-          : <span>Record Answer</span>}
-      </Button>
-
-      {isRecording && <h2 className='text-red-600 flex gap-2 mb-5'><Mic/> Recording...</h2>}
+      
+      <div className="space-y-4">
+        {userAnswer && (
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <h4 className="text-sm font-medium text-gray-500 mb-2">Your current answer:</h4>
+            <p className="text-gray-800">{userAnswer}</p>
+          </div>
+        )}
+        
+        <div className="flex justify-center">
+          <Button 
+            disabled={loading} 
+            onClick={StartStopRecording}
+            className={`px-6 py-3 rounded-lg flex items-center gap-2 transition-all ${
+              isRecording 
+                ? "bg-red-600 hover:bg-red-700 text-white" 
+                : "bg-blue-600 hover:bg-blue-700 text-white"
+            }`}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Processing...</span>
+              </>
+            ) : isRecording ? (
+              <>
+                <StopCircle className="h-4 w-4" />
+                <span>Stop Recording</span>
+              </>
+            ) : (
+              <>
+                <Mic className="h-4 w-4" />
+                <span>Record Answer</span>
+              </>
+            )}
+          </Button>
+        </div>
+        
+        {isRecording && (
+          <div className="flex justify-center items-center gap-2 mt-2">
+            <Waveform className="h-4 w-4 text-red-500 animate-pulse" />
+            <span className="text-sm text-red-500">Speak clearly into your microphone</span>
+          </div>
+        )}
+        
+        {loading && (
+          <div className="bg-blue-50 text-blue-700 p-3 rounded-lg text-sm flex items-center gap-2 mt-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span>Analyzing your answer...</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

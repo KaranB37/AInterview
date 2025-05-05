@@ -10,7 +10,7 @@ const Dashboard = () => {
         <div className="px-4 sm:px-0">
           <h1 className="text-2xl font-medium text-gray-900">Interview Dashboard</h1>
           <p className="mt-2 text-sm text-gray-500 max-w-2xl">
-            Create and manage your AI interview sessions to practice for your next job opportunity.
+            Create and manage your AI interview sessions.
           </p>
         </div>
         
