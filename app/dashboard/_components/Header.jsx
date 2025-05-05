@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect } from 'react'
 import Link from 'next/link'
+import Logo from './schbanglogo.png'
 
 const Header = () => {
     const path = usePathname();
@@ -27,8 +28,8 @@ const Header = () => {
                     <div className="flex items-center">
                         <Link href="/dashboard">
                             <div className="flex items-center cursor-pointer">
-                                <Image src={'/logo.svg'} width={40} height={40} alt='HireBuddy Logo' />
-                                <span className="ml-2 text-xl font-medium text-gray-900">Hire<span className="font-semibold">Buddy</span></span>
+                                <Image src={Logo} width={40} height={40} alt='SchbangInterview' />
+                                <span className="ml-2 text-xl font-medium text-gray-900">Interview | SchbangPeople<span className="font-semibold">Interview</span></span>
                             </div>
                         </Link>
                     </div>
